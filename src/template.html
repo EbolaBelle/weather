@@ -6,17 +6,76 @@
     <title>Document</title>
 </head>
 <body>
+    <h1 class="test"></h1>
     <script>
+        const test = document.querySelector('.test');
+        let weatherObject = {}
         const url = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/'
         const key = '?key=GS4WHYRHXPH63Z32XEB64WU9W'
-        async function weatherReport(location) {
+        /*async function weatherReport(location) {
             const response = await fetch(url + location + key, {mode: "cors"});
             const weatherData = await response.json();
             return weatherData;
+        }*/
+
+        function weatherReport(location) {
+            fetch(url + location + '/' + date1 + '/' + date2 + key, {mode: "cors"})
+            .then(response => response.json())
+            .then(response => {
+                test.textContent = response.days[0].description;
+                populateWeatherObject(response);
+                //weatherObject = response;
+                console.log(response);
+            });
         }
-        const weather = weatherReport('qatar').then(response => console.log(response));
-        //console.log(weather);
-        //weatherReport('qatar').then(response => console.log(response));
+
+        function populateWeatherObject(forecast) {
+            let { currentConditions, days } = forecast;
+            const desiredConditions = ['cloudcover','conditions','icon','temp']
+            const desiredField = ['description','tempmax','tempmin'];
+            for (let key in currentConditions) {
+                if (desiredConditions.includes(key)) {
+                    weatherObject[key] = currentConditions[key];
+                }
+            }
+            for (let field in days[0]) {
+                if (desiredField.includes(field)) {
+                    weatherObject[field] = days[0][field];
+                }
+            }
+           /* let desiredObjects = ['currentConditions','days']
+            
+            for (let key in response) {
+                if (desiredObjects.includes(key)){
+                    if (typeof response[key] === 'object') {
+                        for (let nestedKey in response[key]){
+                            if (desiredFields.includes(nestedKey)) {
+                            weatherObject[nestedKey] = response[key][nestedKey];
+                        }
+                        }
+                    }    
+                } /*else {
+                    if (desiredFields.includes(key)) {
+                        weatherObject[key] = response[key];
+                    }
+                }*/
+                
+            //}
+            /*weatherObject.cloudCover = response.currentConditions.cloudcover;
+            weatherObject.conditions = response.currentConditions.conditions;
+            weatherObject.dayDescription = response.days[0].description;
+            weatherObject.icon = response.currentConditions.icon;
+            weatherObject.tempNow = response.currentConditions.temp;
+            weatherObject.tempMax = response.days[0].tempmax;
+            weatherObject.tempMin = response.days[0].tempmin;*/
+
+        }
+
+        weatherReport('louisville');
+
+        async function returnWeather(location) {
+            await weatherReport(location);
+        }
     </script>
 </body>
 </html>
