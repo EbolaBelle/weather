@@ -11,6 +11,11 @@
     </style>
 </head>
 <body>
+    <form>
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location">
+        <button id="submit" type="button">Submit</button>
+    </form>
     <h1 class="location"></h1>
     <div class="wrapper"></div>
     <script>
@@ -77,6 +82,12 @@
             }
         }
 
+        function cleanSlate(node) {
+            while (node.firstChild) {
+                node.removeChild(node.lastChild);
+            }
+        }
+
         //User Interface
 
         function printHeaders(){
@@ -119,6 +130,15 @@
             }
             return weatherList;
         }
+
+        const locationInput = document.getElementById('location');
+        const submitBtn = document.getElementById('submit')
+        submitBtn.addEventListener('click', () => {
+            let wrapper = document.querySelector('.wrapper');
+            cleanSlate(wrapper);
+            fetchWeather(locationInput.value);
+            locationInput.value = '';
+        })
 
         fetchWeather('louisville');
     </script>
