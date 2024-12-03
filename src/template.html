@@ -61,6 +61,7 @@
         }
 
         function getDailyReport(days, desiredField) {
+            weatherObject.dayList.length = 0;
             for (let i = 0; i < 11; i++) {
                 weatherObject.dayList.push({});
                 for (let field in days[i]) {
@@ -72,6 +73,7 @@
         }
 
         function getHourlyReport(hourly, desiredConditions) {
+            weatherObject.hourlyReport.length = 0;
             for (let i = 0; i < hourly.length; i++) {
                 weatherObject.hourlyReport.push({});
                 for (let field in hourly[i]) {
