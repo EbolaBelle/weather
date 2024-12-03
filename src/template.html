@@ -9,13 +9,16 @@
     <h1 class="test"></h1>
     <script>
         const test = document.querySelector('.test');
-        let weatherObject = {}
+        let weatherObject = {
+            current: {},
+            dayList: [],
+        }
         const url = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/'
         const key = '?key=GS4WHYRHXPH63Z32XEB64WU9W';
 
         function weatherReport(location) {
             let date1 = new Date
-            fetch(url + location + '/' + createDate() + '/' + futureDate() + '/' + key, {mode: "cors"})
+            fetch(url + location + '/' + /*createDate() + '/' + futureDate() + '/' + */key, {mode: "cors"})
             .then(response => response.json())
             .then(response => {
                 test.textContent = response.days[0].description;
@@ -38,16 +41,22 @@
 
         function populateWeatherObject(forecast) {
             let { currentConditions, days } = forecast;
+            console.log(days);
+            console.log(currentConditions);
             const desiredConditions = ['cloudcover','conditions','icon','temp', 'uvindex']
             const desiredField = ['description','tempmax','tempmin'];
             for (let key in currentConditions) {
                 if (desiredConditions.includes(key)) {
-                    weatherObject[key] = currentConditions[key];
+                    weatherObject.current[key] = currentConditions[key];
                 }
             }
-            for (let field in days[0]) {
-                if (desiredField.includes(field)) {
-                    weatherObject[field] = days[0][field];
+            for (let i = 0; i < 11; i++) {
+                weatherObject.dayList.push({});
+                for (let field in days[i]) {
+                    if (desiredField.includes(field)) {
+                        weatherObject.dayList[i][field] = days[i][field];
+                        //weatherObject[`day${i}-${field}`] = days[i][field];
+                    }
                 }
             }
         }
