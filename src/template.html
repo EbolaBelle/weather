@@ -12,6 +12,7 @@
         let weatherObject = {
             current: {},
             dayList: [],
+            hourlyReport: [],
         }
         const url = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/'
         const key = '?key=GS4WHYRHXPH63Z32XEB64WU9W';
@@ -41,10 +42,9 @@
 
         function populateWeatherObject(forecast) {
             let { currentConditions, days } = forecast;
-            console.log(days);
-            console.log(currentConditions);
-            const desiredConditions = ['cloudcover','conditions','icon','temp', 'uvindex']
-            const desiredField = ['description','tempmax','tempmin'];
+            let hourly = days[0].hours;
+            const desiredConditions = ['cloudcover','conditions','icon','temp', 'uvindex', 'precipprob']
+            const desiredField = ['conditions','description','tempmax','tempmin', 'precipprob'];
             for (let key in currentConditions) {
                 if (desiredConditions.includes(key)) {
                     weatherObject.current[key] = currentConditions[key];
@@ -55,7 +55,18 @@
                 for (let field in days[i]) {
                     if (desiredField.includes(field)) {
                         weatherObject.dayList[i][field] = days[i][field];
-                        //weatherObject[`day${i}-${field}`] = days[i][field];
+                    }
+                }
+            }
+            
+        }
+
+        function getHourlyReport(hourly) {
+            for (let i = 0; i < hourly.length; i++) {
+                weatherObject.hourlyReport.push({});
+                for (let field in hourly[i]) {
+                    if (desiredConditions.includes(field)) {
+                        weatherObject.hourlyReport[i][field] = hourly[i][field];
                     }
                 }
             }
