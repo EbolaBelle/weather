@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        ul {
+            list-style-type: none;
+        }
+    </style>
 </head>
 <body>
-    <h1 class="test"></h1>
+    <h1 class="location"></h1>
+    <div class="wrapper"></div>
     <script>
-        const test = document.querySelector('.test');
+        const locationHeader = document.querySelector('.location');
         let weatherObject = {
             location: '',
             current: {},
@@ -18,14 +24,14 @@
         const url = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/'
         const key = '?key=GS4WHYRHXPH63Z32XEB64WU9W';
 
-        function weatherReport(location) {
-            let date1 = new Date
+        function fetchWeather(location) {
             fetch(url + location + '/' + key, {mode: "cors"})
             .then(response => response.json())
             .then(response => {
-                test.textContent = response.days[0].description;
                 populateWeatherObject(response);
                 console.log(response);
+                printHeaders();
+                createWeatherCard(printCurrentConditions(weatherObject.current));
             });
         }
 
@@ -33,7 +39,7 @@
             weatherObject.location = forecast.resolvedAddress;
             let { currentConditions, days } = forecast;
             let hourly = days[0].hours;
-            const desiredConditions = ['datetime','cloudcover','conditions','icon','temp', 'uvindex', 'precipprob'];
+            const desiredConditions = ['cloudcover','conditions','temp', 'uvindex', 'precipprob'];
             const desiredField = ['conditions','description','tempmax','tempmin', 'precipprob'];
             getCurrentReport(currentConditions, desiredConditions);
             getDailyReport(days, desiredField);
@@ -71,7 +77,50 @@
             }
         }
 
-        weatherReport('louisville');
+        //User Interface
+
+        function printHeaders(){
+            locationHeader.textContent = weatherObject.location;
+            const dateTime = document.createElement('h6');
+            dateTime.textContent = new Date().toString().slice(0,24);
+            locationHeader.append(dateTime);
+        }
+
+        function createWeatherCard(info) {
+            const wrapper = document.querySelector('.wrapper');
+            const weatherCard = document.createElement('div');
+            weatherCard.appendChild(info);            
+            wrapper.appendChild(weatherCard);
+        }
+
+        function printCurrentConditions(conditions) {
+            const weatherList = document.createElement('ul');
+            for (let key in conditions) {
+                let heading = document.createElement('li');
+                let currentItem = conditions[key];
+                switch (key) {
+                    case "temp":
+                        heading.textContent = 'Temperature: ' + currentItem + '°';
+                        break;
+                    case 'precipprob':
+                        heading.textContent = 'Precipitation: ' + currentItem + '%';
+                        break;
+                    case 'cloudcover':
+                        heading.textContent = 'Cloud cover: ' + currentItem + '%';
+                        break;
+                    case 'uvindex':
+                        heading.textContent = "UV Index: " + currentItem;
+                        break;
+                    case 'conditions': 
+                        heading.textContent = "Conditions: " + currentItem;
+                        break;
+                }
+                weatherList.appendChild(heading);
+            }
+            return weatherList;
+        }
+
+        fetchWeather('louisville');
     </script>
 </body>
 </html>
