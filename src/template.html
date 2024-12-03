@@ -10,6 +10,7 @@
     <script>
         const test = document.querySelector('.test');
         let weatherObject = {
+            location: '',
             current: {},
             dayList: [],
             hourlyReport: [],
@@ -19,7 +20,7 @@
 
         function weatherReport(location) {
             let date1 = new Date
-            fetch(url + location + '/' + /*createDate() + '/' + futureDate() + '/' + */key, {mode: "cors"})
+            fetch(url + location + '/' + key, {mode: "cors"})
             .then(response => response.json())
             .then(response => {
                 test.textContent = response.days[0].description;
@@ -28,28 +29,27 @@
             });
         }
 
-        function createDate() {
-            let currentDate = new Date().toJSON().slice(0, 10);
-            return currentDate;
-        }
-
-        function futureDate() {
-            let currentDate = new Date();
-            currentDate.setDate(currentDate.getDate() + 10);
-            let tenDaysLater = currentDate.toISOString().slice(0, 10);
-            return tenDaysLater;
-        }
-
         function populateWeatherObject(forecast) {
+            weatherObject.location = forecast.resolvedAddress;
             let { currentConditions, days } = forecast;
             let hourly = days[0].hours;
-            const desiredConditions = ['cloudcover','conditions','icon','temp', 'uvindex', 'precipprob']
+            const desiredConditions = ['datetime','cloudcover','conditions','icon','temp', 'uvindex', 'precipprob'];
             const desiredField = ['conditions','description','tempmax','tempmin', 'precipprob'];
+            getCurrentReport(currentConditions, desiredConditions);
+            getDailyReport(days, desiredField);
+            getHourlyReport(hourly, desiredConditions);
+            console.log(weatherObject);
+        }
+
+        function getCurrentReport(currentConditions, desiredConditions) {
             for (let key in currentConditions) {
                 if (desiredConditions.includes(key)) {
                     weatherObject.current[key] = currentConditions[key];
                 }
             }
+        }
+
+        function getDailyReport(days, desiredField) {
             for (let i = 0; i < 11; i++) {
                 weatherObject.dayList.push({});
                 for (let field in days[i]) {
@@ -58,10 +58,9 @@
                     }
                 }
             }
-            
         }
 
-        function getHourlyReport(hourly) {
+        function getHourlyReport(hourly, desiredConditions) {
             for (let i = 0; i < hourly.length; i++) {
                 weatherObject.hourlyReport.push({});
                 for (let field in hourly[i]) {
